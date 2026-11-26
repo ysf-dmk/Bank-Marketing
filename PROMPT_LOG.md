@@ -40,7 +40,7 @@ Show me a diff of every change, tell me anything you are unsure of instead of gu
 
 ---
 
-## Entry 2 - Author: Mariem Dridi (Module 3: Baseline and Evaluation)
+## Entry 3 - Author: Mariem Dridi (Module 3: Baseline and Evaluation)
 
 **Date:** 2026-11-26
 
@@ -122,3 +122,81 @@ necessary.
 **Related audit:** AI_AUDIT.md — Module 3: Baseline and
 Evaluation, for detailed error analysis, corrected code
 and experimental evidence.
+
+
+
+
+---
+
+## Entry 2 - Author: Chaima Garoui (Module 1: EDA and data quality)
+
+**Date:** Week 1–2
+
+**Note:** The following prompts are reconstructed from the AI-assisted work carried out during this module.
+
+**Prompt 1:** Role: act as a Machine Learning tutor and guide me through the exploratory data analysis of our group project. Explain each step before moving to the next one.
+
+Data: UCI Bank Marketing, bank-additional-full.csv, separator=";", 41,188 observations, 20 input features and a binary target variable y.
+
+Objective: predict whether a customer will subscribe to a term deposit before the marketing call.
+
+Help me perform the following tasks in Google Colab:
+
+1. Load the dataset and verify its dimensions.
+2. Identify numerical and categorical variables.
+3. Check for missing values, including categorical values labelled "unknown".
+4. Detect duplicate rows and calculate their percentage.
+5. Analyze the target distribution and explain the impact of class imbalance.
+6. Generate descriptive statistics and relevant visualizations.
+
+Provide Python code one step at a time. Wait for my output before continuing. Do not clean the dataset or train any model yet, as these tasks belong to other team members.
+
+Explain the results in simple English and do not invent numerical findings.
+
+**Prompt 2:** I have completed the initial EDA. Help me interpret the following observations and identify the main issues that need to be communicated to the preprocessing team.
+
+Findings:
+
+- 41,188 observations and 21 columns, including the target.
+- No standard NaN values.
+- Several categorical features contain "unknown" values.
+- 12 exact duplicate rows.
+- 88.73% of customers did not subscribe, while 11.27% subscribed.
+- Subscription rates vary across age groups, occupations and education levels.
+- The duration variable is only available after the call.
+- A value of 999 in pdays indicates no previous contact.
+
+Explain:
+
+A. Why accuracy alone is not sufficient for this classification problem.
+
+B. Why duration introduces data leakage.
+
+C. Whether the duplicate rows should be removed, considering that the dataset has no unique customer identifier.
+
+D. How unknown categorical values and the special value in pdays could be handled during preprocessing.
+
+E. Why high subscription rates in small customer groups should be interpreted carefully.
+
+Distinguish observed results from assumptions. Do not interpret statistical associations as causal relationships.
+
+**Prompt 3:** I have completed my EDA notebook in Google Colab and need to share my work with the other three members of our Machine Learning project.
+
+Repository: ysf-dmk/Bank-Marketing.
+
+The notebook currently loads the dataset from /content/bank-additional-full.csv, which requires manually uploading the file in every new Colab session.
+
+Help me:
+
+1. Upload the original dataset to the shared GitHub repository.
+2. Replace the temporary dataset path with a GitHub raw URL.
+3. Resolve any dataset loading errors.
+4. Verify that the notebook runs successfully from beginning to end.
+5. Upload the updated notebook under a filename that reflects my EDA contribution.
+6. Create a README.md containing the project objective, dataset description, EDA findings and preprocessing recommendations.
+
+Do not modify the original dataset or implement the preprocessing pipeline.
+
+The documentation should clearly distinguish completed work from planned experiments. Do not report model performance before the baseline has been implemented.
+
+Guide me step by step and explain the purpose of each action.
