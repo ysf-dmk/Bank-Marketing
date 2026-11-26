@@ -4,7 +4,7 @@
 **Module:** Module 3 - Baseline and Evaluation
 **Date:** 2026-11-26
 **AI tool:** ChatGPT
-**Related interaction:** PROMPT_LOG.md - Entry 2
+**Related interaction:** PROMPT_LOG.md - Entry 3
 
 ---
 
