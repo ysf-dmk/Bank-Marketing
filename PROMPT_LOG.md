@@ -368,3 +368,145 @@ Then answer separately: A. one sentence on each design choice; B. every assumpti
 [1-2 sentences: what the guardrails improved, what still needed human checking.]
 
 **Related audit:** AI_AUDIT.md - [add the audit number if one is written for this update].
+---
+
+## Entry 7 - Author: Chaima Garoui (Module 1 Update: Week 3 Model Comparison, Error Analysis and Business Evaluation)
+
+**Date:** 2026-11-27
+
+**AI tool:** ChatGPT
+
+**Status:** Executed, reviewed and integrated into `Model_Comparison_and_Error_Analysis.ipynb`.
+
+**Note:** The following prompts are reconstructed from the AI-assisted work carried out during Week 3. They are not verbatim conversation transcripts.
+
+### Prompt 1 — Model comparison and evaluation
+
+Role: Act as a Machine Learning tutor and engineering assistant. Guide me step by step through my individual contribution for Week 3.
+
+Context: Our group project uses the UCI Bank Marketing dataset to predict term deposit subscription before the marketing call.
+
+Reuse the shared preprocessing methodology and stratified 60/20/20 split with random_state=42.
+
+Help me:
+
+1. Compare the Dummy Classifier, default Logistic Regression and threshold-optimized Logistic Regression.
+2. Evaluate their classification performance using appropriate metrics for an imbalanced dataset.
+3. Compare confusion matrices and identify the trade-off between precision and recall.
+4. Generate comparative visualizations.
+5. Explain the results in simple English.
+
+Constraints:
+
+- Reuse the shared preprocessing module.
+- Do not introduce data leakage.
+- Perform comparisons on the validation set.
+- Preserve the independent test set.
+- Do not invent experimental results.
+- Wait for my execution output before proceeding to the next step.
+
+### Prompt 2 — Business cost sensitivity analysis
+
+Help me extend the baseline comparison by evaluating the potential business consequences of false positives and false negatives.
+
+Assume a hypothetical false positive cost of €1 and investigate different false negative costs.
+
+Calculate:
+
+1. Total misclassification cost for each model configuration.
+2. Cost sensitivity under different scenarios.
+3. Break-even points between model configurations.
+4. Comparative cost visualizations.
+
+Explain why the model maximizing F1-score is not necessarily the most economically appropriate model.
+
+Clearly distinguish hypothetical costs from actual financial information. Do not claim that the results establish real campaign profitability.
+
+### Prompt 3 — Demographic error analysis and statistical reliability
+
+Help me investigate whether the threshold-optimized Logistic Regression model performs differently across customer groups.
+
+Analyze performance according to:
+
+- Age group.
+- Occupation.
+- Education level.
+- Marital status.
+
+For each subgroup, calculate the number of customers, actual subscribers, true positives, false positives, false negatives, recall and false positive rate.
+
+Extend the analysis with 95% Wilson confidence intervals for recall.
+
+Account for small subgroup sample sizes and handle groups containing no actual subscribers appropriately.
+
+Generate visualizations and interpret the observed performance differences without claiming causality or discrimination.
+
+### Prompt 4 — Customer targeting and campaign efficiency
+
+Help me evaluate how predicted subscription probabilities could support marketing campaign targeting.
+
+Rank validation customers according to their predicted probability of subscription.
+
+Calculate:
+
+1. Cumulative gains.
+2. Lift.
+3. Subscriber capture rates.
+4. Precision among selected customers.
+5. Number of contacts avoided.
+
+Compare targeting strategies covering the top 5%, 10%, 20%, 30%, 50% and 100% of customers.
+
+Generate cumulative gains and lift curves.
+
+Explain the potential business implications while distinguishing retrospective validation simulations from actual campaign outcomes.
+
+### Prompt iteration and human review
+
+The AI-assisted workflow was conducted progressively in Google Colab. Code was executed and the resulting tables and visualizations were reviewed before continuing to subsequent experiments.
+
+The initial analysis focused on standard classification metrics. Subsequent interactions extended the evaluation to include:
+
+- Business cost sensitivity.
+- Break-even analysis.
+- Demographic error profiling.
+- Statistical uncertainty of subgroup recall.
+- Probability-based customer targeting.
+- Cumulative gains and lift analysis.
+
+### Human decisions and experimental verification
+
+- Retained the shared preprocessing methodology and validation split.
+- Used hypothetical misclassification costs because actual bank campaign costs were unavailable.
+- Compared different decision thresholds instead of assuming that the default threshold was optimal.
+- Extended subgroup recall analysis with Wilson confidence intervals to avoid overinterpreting small samples.
+- Treated undefined recall separately from zero recall.
+- Interpreted customer targeting results as simulations rather than realized financial benefits.
+- Preserved the independent test set during the individual experiments.
+
+### Main verified results
+
+- Validation set: 8,235 customers, including 928 actual subscribers.
+- Recall increased from 22.09% to 52.69% after threshold optimization.
+- False negatives decreased from 723 to 439.
+- False positives increased from 91 to 480.
+- The unknown occupation group achieved 100% recall, but its 95% Wilson confidence interval was 56.55%–100.00%, based on only five actual subscribers.
+- Targeting the top 20% of customers captured 65.19% of observed subscribers, with a lift of 3.26.
+
+### Remaining limitations
+
+- Actual business costs were unavailable.
+- No formal statistical significance tests were performed between demographic groups.
+- Potential dependencies between observations may affect confidence interval interpretation.
+- The analysis focused on the Logistic Regression baseline rather than the final ensemble model.
+- Actual campaign profitability and causal effects were not measured.
+
+### Conclusion
+
+AI assistance accelerated the development of the evaluation code, visualizations and statistical analysis. However, human review and experimental verification were necessary to ensure that the results were correctly interpreted.
+
+The progressive prompt constraints helped maintain consistency with the shared project methodology and reduced the risk of unsupported statistical and business conclusions.
+
+**Related audit:** `AI_AUDIT.md` — Audit 8 (Statistical Reliability of Subgroup Model Performance).
+
+**Evidence:** `Model_Comparison_and_Error_Analysis.ipynb`.
