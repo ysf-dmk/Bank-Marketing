@@ -510,3 +510,142 @@ The progressive prompt constraints helped maintain consistency with the shared p
 **Related audit:** `AI_AUDIT.md` — Audit 8 (Statistical Reliability of Subgroup Model Performance).
 
 **Evidence:** `Model_Comparison_and_Error_Analysis.ipynb`.
+
+---
+
+## Entry 8 - Author: Mariem Dridi (Module 3 Update: Hyperparameter Tuning and Temporal Evaluation, Week 3)
+
+### Objective
+
+Optimize Logistic Regression using GridSearchCV under both random and temporal evaluation protocols, while maintaining consistency with the shared preprocessing pipeline and protecting the held-out test sets.
+
+### Initial Prompt
+
+> How can I optimize a Logistic Regression model using GridSearchCV for the Bank Marketing dataset and compare its performance under random and chronological train-validation-test splits? Provide Python code for hyperparameter tuning, threshold optimization and model evaluation.
+
+### Limitations of the Initial AI Response
+
+The initial response correctly recommended Average Precision, StratifiedKFold for random evaluation, TimeSeriesSplit for temporal evaluation, and validation-based threshold optimization.
+
+However, several limitations were identified:
+
+- It reimplemented the splitting logic instead of directly using the shared project functions.
+- It proposed `build_preprocessor(X_train)`, although the actual function takes no arguments.
+- It included test-set class distributions and final test evaluation code, which were outside the scope of this task.
+- It recommended checking class presence in cross-validation folds without implementing explicit verification.
+- It referenced `results_df` without defining it.
+- It did not explicitly monitor convergence warnings.
+
+These limitations motivated a more constrained prompt.
+
+### Refined Prompt — Engineering Guardrails
+
+> Act as a machine learning engineering assistant. Provide reviewable Python code and justify each methodological choice. Flag uncertainty instead of guessing.
+>
+> **Dataset and schema:**
+> - UCI Bank Marketing, bank_clean.csv.
+> - 41,176 observations, 20 predictors and binary target y encoded as 0/1.
+> - Approximately 11.27% positive observations.
+> - The post-call duration variable has already been removed.
+> - The pdays sentinel has already been handled, and was_contacted_before is included.
+>
+> **Objective:**
+> Tune Logistic Regression using GridSearchCV and compare tuned and untuned baselines under random and chronological evaluation protocols.
+>
+> **Mandatory constraints:**
+> - Reuse split(df), time_split(df), and build_preprocessor() from src/data_prep.py.
+> - build_preprocessor() takes no arguments.
+> - Do not recreate the splits or repeat data cleaning.
+> - Use the shared 60/20/20 protocols.
+> - Use separate preprocessing and model pipelines for each protocol.
+> - Fit preprocessing strictly inside each cross-validation training fold.
+> - Use StratifiedKFold with five folds, shuffle=True and random_state=42 for the random protocol.
+> - Use TimeSeriesSplit with five folds for the temporal protocol.
+> - Use Average Precision as the GridSearchCV scoring metric.
+> - Search C=[0.001,0.01,0.1,1,10,100], class_weight=[None, "balanced"], and solver=["liblinear", "lbfgs"], retaining L2 regularization.
+> - Select hyperparameters exclusively on training data.
+> - Optimize the F1 decision threshold independently on each validation set and preserve its full numerical precision.
+> - Do not inspect, evaluate or use either test set.
+>
+> **Verification and fallback requirements:**
+> - Verify dataset dimensions, target encoding and absence of duration.
+> - Verify training and validation sizes and disjoint indices.
+> - Assert chronological ordering within every temporal cross-validation fold.
+> - Verify that both classes are present in every training and validation fold. If this fails, stop and explain the issue.
+> - Verify positive-class probability ordering.
+> - Check for convergence warnings and report them rather than silently ignoring them.
+> - Ensure all variables and comparison DataFrames are explicitly defined before use.
+> - Generate comparison metrics programmatically rather than hardcoding experimental results.
+>
+> **Evaluation and interpretation:**
+> Report validation accuracy, precision, recall, F1-score, ROC-AUC and Average Precision. Include confusion matrices and a comparison table.
+>
+> Distinguish Average Precision from trapezoidal PR-AUC. Explain the effects of class-prior shift, possible temporal distribution shift, repeated feature patterns and validation threshold selection bias.
+>
+> Do not claim that hyperparameter tuning necessarily improves performance or that chronological ordering is guaranteed solely by a monotonic index.
+>
+> Do not fabricate numerical results. Clearly distinguish verified findings from assumptions and untested hypotheses.
+
+### Improvement After Prompt Refinement
+
+The refined response:
+
+- Reused the shared splitting and preprocessing functions.
+- Corrected the preprocessing function signature.
+- Excluded test-set inspection and evaluation.
+- Introduced explicit cross-validation checks and fail-fast conditions.
+- Restricted the hyperparameter grid to the agreed 24 configurations.
+- Proposed convergence warning monitoring.
+- Generated evaluation metrics programmatically.
+- Distinguished class prevalence changes from potential distribution shift and concept drift.
+- Acknowledged validation threshold selection bias and chronological ordering assumptions.
+
+### Human Verification and Decisions
+
+The AI-generated recommendations were reviewed against the existing notebook implementation. The complete AI-generated implementation was not adopted automatically.
+
+Two additional verification experiments were conducted in `Baseline_Model.ipynb`.
+
+**1. Split consistency verification**
+
+The training and validation indices proposed in the initial response were compared with the shared project functions.
+
+| Protocol | Identical training indices | Identical validation indices |
+|---|---|---|
+| Random | True | True |
+| Temporal | True | True |
+
+No actual splitting inconsistency was detected. Nevertheless, the shared functions were retained to prevent future implementation divergence and improve reproducibility.
+
+**2. Cross-validation ordering verification**
+
+| Strategy | Folds respecting temporal row order |
+|---|---|
+| StratifiedKFold | 0/5 |
+| TimeSeriesSplit | 5/5 |
+
+This confirmed the methodological suitability of TimeSeriesSplit for temporal evaluation, assuming that the dataset preserves its original chronological ordering.
+
+### Verified Experimental Results
+
+| Protocol | Best C | Class Weight | Solver | Mean CV AP | Validation F1 | Validation ROC-AUC | Validation AP |
+|---|---:|---|---|---:|---:|---:|---:|
+| Random | 1.0 | None | liblinear | 0.4499 | 0.5147 | 0.8082 | 0.4741 |
+| Temporal | 0.1 | None | liblinear | 0.0557 | 0.2195 | 0.4841 | 0.0985 |
+
+Validation F1 was measured after independent threshold optimization.
+
+The experiments showed that hyperparameter tuning provided negligible improvements over the untuned Logistic Regression models and did not resolve the substantial decline in temporal performance.
+
+### Final Engineering Decision
+
+Retain Logistic Regression as an interpretable reference model for both evaluation protocols.
+
+The observed temporal performance decline should be reported as an important experimental finding rather than treated as an implementation error. Its underlying causes require further investigation.
+
+All hyperparameter and threshold selection performed in Module 3 used training and validation data only. Neither held-out test set was inspected or evaluated during this task.
+
+The refined AI response was used as a methodological review, not as evidence of independently executed experiments. Proposed additional checks that were not executed are not claimed as verified results.
+
+**Related evidence:** `Baseline_Model.ipynb` and `AI_AUDIT.md`.
+

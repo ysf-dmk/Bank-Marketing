@@ -343,3 +343,43 @@ AI-assisted code was reviewed, executed and interpreted by the contributor. Expe
 The independent test set was not used in the individual model error analysis or customer targeting experiments.
 
 **Status:** Individual EDA and baseline error analysis completed. Extension of the analysis to the team's alternative and ensemble models remains pending.
+
+### Week 3 Update — Hyperparameter Tuning and Temporal Evaluation
+
+**Tasks completed:**
+
+- Implemented GridSearchCV for Logistic Regression under random and temporal evaluation protocols.
+- Evaluated 24 hyperparameter configurations using five-fold cross-validation for each protocol.
+- Used StratifiedKFold for random evaluation and TimeSeriesSplit for temporal evaluation.
+- Selected hyperparameters using Average Precision on training cross-validation folds.
+- Optimized decision thresholds independently on the validation sets.
+- Compared tuned and untuned Logistic Regression models using six evaluation metrics.
+- Generated confusion matrices, comparison tables and performance visualizations.
+- Verified consistency with the shared splitting functions.
+- Experimentally verified temporal cross-validation ordering.
+- Documented AI prompt refinement and human verification in PROMPT_LOG.md (Entry 8) and AI_AUDIT.md.
+- Preserved the held-out test sets throughout the tuning and validation experiments.
+
+**Main experimental results:**
+
+| Metric | Random — Tuned LR | Temporal — Tuned LR |
+|---|---:|---:|
+| Best C | 1.0 | 0.1 |
+| Mean CV Average Precision | 0.4499 | 0.0557 |
+| Validation Accuracy | 0.8880 | 0.3791 |
+| Validation Precision | 0.5031 | 0.1275 |
+| Validation Recall | 0.5269 | 0.7884 |
+| Validation F1-score | 0.5147 | 0.2195 |
+| Validation ROC-AUC | 0.8082 | 0.4841 |
+| Validation Average Precision | 0.4741 | 0.0985 |
+
+**Main conclusion:**
+
+Hyperparameter tuning provided negligible improvements over the untuned Logistic Regression models. Temporal performance remained substantially weaker than random-split performance, highlighting potential temporal generalization difficulties.
+
+**Files updated:**
+
+- `Baseline_Model.ipynb`
+- `PROMPT_LOG.md`
+- `AI_AUDIT.md`
+- `CONTRIBUTIONS.md`
