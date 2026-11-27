@@ -481,3 +481,40 @@ especially when small groups produce apparently
 strong results.
 
 **Evidence:** EDA_and_Data_Quality.ipynb
+
+---
+
+## Author: Adam Nasri
+**Module:** Module 4 - Alternative Models and Performance Comparison
+**Date:** 2026-11-27
+**AI tool:** Gemini
+**Related interaction:** PROMPT_LOG.md - Module 4 Entries
+
+---
+
+## Audit 6 - Avoiding Preprocessing Leakage Inside Cross-Validation and Uncalibrated Neural Probabilities
+
+### 1. Catch: Identified flaws
+
+1. Pre-transforming `X_train` before passing it into `RandomizedSearchCV` fits `StandardScaler` across all 5 folds simultaneously, leaking validation fold statistics into training folds.
+2. Using a raw `MLPClassifier` without probability calibration produces poorly scaled probabilities under an 88.73% / 11.27% class imbalance, destabilizing validation F1 threshold selection.
+
+### 2. Root cause
+
+Standard hyperparameter tuning templates often call `preprocessor.fit_transform(X_train)` outside the cross-validation loop for speed, while neural classifiers optimize log-loss without guaranteeing calibrated posterior probabilities on imbalanced tabular data.
+
+### 3. Statistical consequences
+
+- Fitting scalers outside CV introduces optimistic bias in cross-validated `average_precision` scores.
+- Uncalibrated MLP outputs compress or skew predicted probabilities, making threshold transfer from `X_val` to `X_test` unreliable.
+
+### 4. Correct: Human intervention
+
+- Wrapped `build_preprocessor()` directly inside every scikit-learn `Pipeline` passed to `RandomizedSearchCV` so scaling and one-hot encoding are refitted strictly on the 4 training folds of each split.
+- Wrapped the regularized `MLPClassifier` inside `CalibratedClassifierCV(method="sigmoid", cv=5)` (following Niculescu-Mizil & Caruana, 2005) before validation threshold optimization.
+
+### 5. Experimental verification
+
+- Verified that all candidate pipelines (`Random Forest`, `XGBoost`, `LightGBM`, `Calibrated MLP`) accept raw `X_train` / `X_val` / `X_test` DataFrames directly and beat the Module 3 baseline on `X_val` (`0.5027` and `0.4798` vs. `0.4742` PR-AUC) without touching `X_test` until the final cell.
+
+**Status:** Verified and integrated into `Alternative_Models_Comparison.ipynb`.

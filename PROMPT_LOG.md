@@ -204,3 +204,55 @@ Do not modify the original dataset or implement the preprocessing pipeline.
 The documentation should clearly distinguish completed work from planned experiments. Do not report model performance before the baseline has been implemented.
 
 Guide me step by step and explain the purpose of each action.
+
+
+---
+
+## Entry 4 - Author: Adam Nasri (Module 4: Alternative Models and Performance Comparison)
+
+**Date:** 2026-11-27
+
+**AI tool:** Gemini
+
+**Status:** Executed, verified, and integrated into `Alternative_Models_Comparison.ipynb`.
+
+### Initial prompt
+
+Help me build my part (Module 4) of our group Machine Learning project on the UCI Bank Marketing dataset: train advanced models (Random Forest, XGBoost, LightGBM), add an out-of-course algorithm with a scientific reference, tune hyperparameters, analyze errors, and evaluate on the test set in VS Code.
+
+### Refined prompt
+
+Role: Act as a senior ML engineering assistant. Provide reviewable, self-contained Python cells and academic Markdown interpretations in English for `Alternative_Models_Comparison.ipynb`. Flag methodological pitfalls and never fabricate results.
+
+Data & Shared Protocol: UCI Bank Marketing (`bank_clean.csv`, 41,176 rows, 20 predictors after dropping post-call `duration`, binary target `y` with 11.27% positives). Reuse `load_raw()`, `clean()`, `split()`, and `build_preprocessor()` from `src/data_prep.py` (`random_state=42`, stratified 60/20/20 split: 24,705 train / 8,235 val / 8,236 test).
+
+Objective: Benchmark advanced model families against the Module 3 baselines (`DummyClassifier` and `LogisticRegression`, validation PR-AUC = 0.4742, ROC-AUC = 0.8081, F1 = 0.5156).
+
+Constraints:
+
+- Encapsulate `build_preprocessor()` inside every scikit-learn `Pipeline` passed to `RandomizedSearchCV` (`StratifiedKFold(n_splits=5)`) so scaling and one-hot encoding are refitted strictly inside each training fold.
+- Optimize `average_precision` (PR-AUC) rather than raw accuracy due to the 88.73% / 11.27% class imbalance, and handle imbalance via `class_weight="balanced_subsample"` (Random Forest) and `scale_pos_weight` computed on `X_train` only (XGBoost, LightGBM).
+- Include an out-of-course model grounded in peer-reviewed literature: a regularized `MLPClassifier` wrapped with post-hoc sigmoid calibration (`CalibratedClassifierCV`), citing Gorishniy et al. (2021) and Niculescu-Mizil & Caruana (2005).
+- Tune decision thresholds strictly on `X_val` (maximizing F1-score). Never touch `X_test` during model selection or threshold tuning.
+- Conduct global feature attribution via SHAP (`TreeExplainer`), validation error profiling across TP/FP/FN/TN outcomes, and a chronological 60/20/20 split check (May 2008 – November 2010) to quantify temporal concept drift.
+- Execute a single, final evaluation on the untouched `X_test` set using the locked validation threshold.
+
+### Prompt iteration and human review
+
+Both prompts were executed using Gemini on 2026-11-27 while setting up the local VS Code environment.
+
+The initial response outlined the candidate model families and evaluation metrics at a high level, without enforcing the exact shared split interface (`src/data_prep.py`) or isolating preprocessing inside cross-validation folds.
+
+The refined prompt enforced strict engineering and statistical guardrails:
+
+- Schema and split assertions verifying exact alignment with Module 2 and Module 3 (`24,705 / 8,235 / 8,236` rows, zero leakage of `duration`).
+- Pipeline encapsulation inside `RandomizedSearchCV` to prevent scaling leakage across CV folds.
+- Post-hoc probability calibration (`CalibratedClassifierCV`) for the out-of-course MLP model so predicted probabilities remain reliable under class imbalance.
+- Chronological split evaluation exposing severe macroeconomic concept drift (positive rate shifting from `4.81%` in 2008–2009 to `30.83%` in 2010, dropping chronological validation PR-AUC to `0.1197`).
+- Single-pass evaluation on `X_test` confirming that `Random Forest (Tuned)` outperforms the baseline (`Test PR-AUC = 0.4632` vs. `0.4423`; `Test F1 = 0.5049` vs. `0.4812`).
+
+### Conclusion
+
+Constraining the AI to reuse the shared preprocessing module, nest transformers inside CV pipelines, and validate temporal drift prevented cross-validation leakage and produced reproducible, experimentally verified results across validation and holdout test sets.
+
+**Related audit:** `AI_AUDIT.md` — Audit 5 (Module 4: Alternative Models and Performance Comparison).
