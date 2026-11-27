@@ -94,3 +94,28 @@ The EDA notebook loads the dataset directly from GitHub. No manual dataset uploa
 ## Next Steps
 
 The next step is to prepare the dataset for modelling. Once preprocessing is completed, we will train and evaluate the baseline model before experimenting with more advanced classifiers.
+
+## Temporal Sensitivity Analysis
+
+An additional chronological split experiment was conducted
+to evaluate the robustness of the baseline models.
+
+| Metric | Random Split | Temporal Split |
+|---|---:|---:|
+| Optimized F1-score | 0.5156 | 0.2187 |
+| ROC-AUC | 0.8081 | 0.4836 |
+| Average Precision | 0.4742 | 0.0984 |
+
+The results reveal a substantial deterioration in temporal
+generalization compared with the random split.
+
+Changes in class distribution and potential macroeconomic
+drift may contribute to this deterioration.
+
+Threshold optimization improves temporal recall to 81.47%,
+but precision remains low at 12.63%.
+
+All reported results are based on validation data only.
+
+Detailed methodology, results and visualizations are
+available in Baseline_Model.ipynb.

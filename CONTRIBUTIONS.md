@@ -101,12 +101,12 @@ review the draft and to propose the assertion checks.
 
 ### AI governance contributions
 
-- PROMPT_LOG.md: Entry 2, initial and constrained prompts.
+- PROMPT_LOG.md: Entry 3, initial and constrained prompts.
 - AI_AUDIT.md: identification, correction and experimental
   verification of AI-generated methodological and
   technical issues.
 
-### Main experimental results
+### Main experimental results — Random Split
 
 - Logistic Regression ROC-AUC: 0.8081.
 - Logistic Regression Average Precision: 0.4742.
@@ -115,6 +115,30 @@ review the draft and to propose the assertion checks.
 - Recall improvement: from 0.2209 to 0.5269.
 - Selected validation threshold: approximately 0.2385.
 
+### Additional experiment — Temporal Sensitivity Analysis
+
+- Reused the chronological time_split() function from
+  src/data_prep.py.
+- Verified temporal split sizes and class distributions.
+- Retrained DummyClassifier and Logistic Regression using
+  the temporal training set.
+- Evaluated both models exclusively on temporal validation.
+- Optimized the classification threshold independently.
+- Generated confusion matrices and comparative visualizations.
+- Compared random and temporal validation performance.
+- Documented temporal generalization limitations.
+
+### Temporal experimental results
+
+- Training positive class rate: 4.81%.
+- Validation positive class rate: 11.07%.
+- ROC-AUC: 0.4836.
+- Average Precision: 0.0984.
+- Optimized F1-score: 0.2187.
+- Optimized recall: 0.8147.
+- Optimized precision: 0.1263.
+- Optimized threshold: approximately 7.7963e-06.
+
 ### Individual accountability
 
 Responsible for the implementation, verification,
@@ -122,6 +146,9 @@ interpretation and documentation of Module 3.
 
 AI-generated recommendations were reviewed and
 experimentally verified where applicable.
+
+No test data was used for model evaluation or threshold
+selection during Module 3 experiments.
 
 ---
 
