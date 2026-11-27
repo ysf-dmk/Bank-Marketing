@@ -610,3 +610,115 @@ Actual validation results:
 | Student | 57 | 84.21% | 72.64%–91.46% | 18.83 pp |
 | Admin. | 299 | 60.54% | 54.89%–65.91% | 11.01 pp |
 | Blue-collar | 120 | 25.83% | 18.84%–34.33% | 15.
+
+---
+
+## Module 3 Update — Logistic Regression Hyperparameter Tuning
+
+**Author:** Mariem Dridi  
+**Related prompt:** PROMPT_LOG.md — Entry 8  
+**Evidence:** Baseline_Model.ipynb
+
+### Issue 1 — Test Set Access Outside the Experimental Scope
+
+**AI-generated suggestion**
+
+The initial AI response included test-set class distributions and a final evaluation section using the held-out random and temporal test sets.
+
+**Root cause**
+
+The initial prompt did not explicitly specify the validation-only boundary required for this stage of the project. The AI therefore proposed a complete machine learning evaluation workflow rather than respecting the narrower scope of Module 3.
+
+**Potential impact**
+
+Premature test-set inspection could influence subsequent methodological decisions and compromise the independence of the final evaluation.
+
+**Human correction**
+
+- Restricted GridSearchCV to training data.
+- Selected decision thresholds exclusively on validation data.
+- Excluded test-set inspection and evaluation from the tuning experiment.
+- Added explicit test-set protection requirements to the refined prompt.
+
+**Verification**
+
+The implemented tuning and evaluation procedures used training and validation variables only. The refined AI response also excluded test-set evaluation.
+
+**Status:** Corrected scope mismatch. No actual test leakage was observed during this task.
+
+### Issue 2 — Incomplete Comparison Table Implementation
+
+**AI-generated suggestion**
+
+The initial response initialized an empty results list and defined the four experiments but subsequently referenced `results_df` without creating it in the supplied implementation.
+
+**Root cause**
+
+The AI omitted the intermediate evaluation and DataFrame construction step.
+
+**Potential impact**
+
+The proposed visualization code was not independently executable and could raise a NameError in a clean notebook environment.
+
+**Human correction**
+
+The project notebook explicitly constructs the comparison DataFrame containing the tuned and untuned Logistic Regression results for both evaluation protocols.
+
+The refined prompt also required all variables and comparison DataFrames to be defined before use.
+
+**Verification**
+
+The comparison table and performance visualization were successfully generated in Baseline_Model.ipynb.
+
+The original AI-generated implementation was not executed in full.
+
+**Status:** Corrected implementation omission.
+
+### Additional Verification 1 — Shared Split Consistency
+
+The initial AI response independently recreated the random and temporal splitting logic instead of directly calling the shared project functions.
+
+This introduced a potential reproducibility and maintenance risk.
+
+The proposed training and validation indices were compared experimentally with the shared implementation.
+
+| Protocol | Identical training indices | Identical validation indices |
+|---|---|---|
+| Random | True | True |
+| Temporal | True | True |
+
+All four comparisons returned True.
+
+No actual experimental inconsistency was detected. The shared `split()` and `time_split()` functions were retained to prevent future divergence between team members.
+
+**Status:** Verified maintenance risk, not a confirmed splitting error.
+
+### Additional Verification 2 — Temporal Cross-Validation
+
+An additional experiment compared StratifiedKFold and TimeSeriesSplit on the temporal training partition.
+
+For each fold, the maximum training position was compared with the minimum validation position.
+
+| Cross-validation strategy | Folds respecting temporal row order |
+|---|---|
+| StratifiedKFold | 0/5 |
+| TimeSeriesSplit | 5/5 |
+
+The experiment confirmed that TimeSeriesSplit preserves temporal row ordering, whereas shuffled StratifiedKFold does not.
+
+The initial AI response already recommended the correct cross-validation strategy. This experiment therefore validates an AI recommendation rather than correcting an AI error.
+
+The chronological interpretation remains conditional on the preservation of the original dataset ordering.
+
+**Status:** Methodological recommendation experimentally verified.
+
+### Final Human Assessment
+
+The refined prompt improved the alignment of the AI response with the project's shared implementation, evaluation boundaries and statistical assumptions.
+
+However, AI-generated code was not accepted automatically. Recommendations were reviewed against the existing notebook and verified where appropriate.
+
+The final experiments demonstrated that hyperparameter tuning produced negligible improvements and did not resolve the weak temporal generalization performance.
+
+No unsupported numerical results, confirmed leakage claims or unverified causal explanations were introduced.
+
