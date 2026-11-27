@@ -6,10 +6,10 @@
 
 | Team member | Module | Responsibility |
 |---|---|---|
-| Chaima | Module 1 | Exploratory Data Analysis and Data Quality |
+| Chaima Garoui | Module 1 | Exploratory Data Analysis and Data Quality |
 | Youssef Damak | Module 2 | Data Cleaning and Preprocessing |
 | Mariem Dridi | Module 3 | Baseline Models and Evaluation |
-| Adam | Module 4 | Alternative Models and Performance Comparison |
+| Adam Nasri | Module 4 | Alternative Models and Performance Comparison |
 
 ---
 
@@ -124,6 +124,80 @@ AI_AUDIT.md. A second AI session (Claude chat) was used to
 review the draft and to propose the assertion checks.
 
 ---
+
+
+---
+
+## Module 1 - Exploratory Data Analysis and Data Quality
+
+**Author:** Chaima Garoui
+
+**Deliverables:** EDA_and_Data_Quality.ipynb, README.md, bank-additional-full.csv
+
+### Completed tasks
+
+- Selection and initial exploration of the UCI Bank Marketing dataset.
+- Definition of the business objective and binary classification problem.
+- Identification of numerical and categorical features.
+- Verification of dataset dimensions and data types.
+- Detection of missing values and categorical values labelled "unknown".
+- Identification of 12 exact duplicate rows.
+- Analysis of the target distribution and class imbalance.
+- Descriptive statistical analysis of numerical features.
+- Visualization of customer characteristics and subscription rates.
+- Analysis of subscription rates across age groups, occupations and education levels.
+- Identification of potential data leakage associated with duration.
+- Identification of the special value 999 in pdays.
+- Communication of EDA findings and preprocessing recommendations to Module 2.
+- Preparation of the Week 1 project specification.
+- Implementation of reproducible dataset loading directly from GitHub.
+- Creation of the project README.md.
+
+### Human decisions
+
+- Use bank-additional-full.csv as the original dataset.
+- Define the prediction objective before the marketing call.
+- Recommend excluding duration because it is unavailable before the call.
+- Preserve the original dataset during EDA and leave cleaning decisions to Module 2.
+- Avoid relying on accuracy alone because of the imbalanced target distribution.
+- Interpret high subscription rates in small customer groups with caution.
+- Avoid treating observed associations as causal relationships.
+- Replace temporary Colab file paths with a shared GitHub dataset URL.
+
+### AI governance contributions
+
+- PROMPT_LOG.md: EDA, statistical interpretation, data quality analysis and reproducibility prompts.
+- AI_AUDIT.md: individual audit entry to be completed after reviewing and verifying the identified AI-generated issues.
+
+### Main results
+
+- 41,188 observations and 21 columns.
+- 20 input features: 10 numerical and 10 categorical.
+- No standard NaN missing values.
+- 12 exact duplicate rows, representing approximately 0.03% of the dataset.
+- 36,548 negative observations (88.73%).
+- 4,640 positive observations (11.27%).
+- Average customer age: 40.02 years.
+- Median customer age: 38 years.
+- 8,597 unknown values in default.
+- 1,731 unknown values in education.
+- 990 unknown values in housing and 990 in loan.
+- 330 unknown values in job.
+- 80 unknown values in marital.
+- Customers aged 65 and above had an observed subscription rate of approximately 47.21%.
+- Students had an observed subscription rate of approximately 31.4%.
+- The illiterate education category contained only 18 observations, making its subscription rate of 22.22% unreliable as a general conclusion.
+
+### Individual accountability
+
+Responsible for the implementation, verification, interpretation and documentation of Module 1.
+
+ChatGPT was used to support the development of the EDA notebook, explain statistical observations and assist with GitHub integration.
+
+The generated code was executed in Google Colab. Numerical findings were checked against the dataset outputs before being included in the documentation.
+
+The original dataset was preserved, and the identified data quality issues were communicated to the preprocessing module owner.
+
 
 ## Other individual contributions
 
