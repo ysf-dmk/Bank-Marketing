@@ -76,6 +76,32 @@ def split(df):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
+def time_split(df):
+    """Chronological 60/20/20 split on row order. Same return signature as split().
+
+    Assumes row order = time order (the file is date-sorted, no date column).
+    No shuffling, no stratification: class shares per block are whatever they are.
+    """
+    # Guard: if the rows were shuffled or re-sorted, this split would be wrong
+    # without any error, so fail loudly instead.
+    if not df.index.is_monotonic_increasing:
+        raise ValueError("time_split needs the original row order (increasing index)")
+
+    X = df.drop(columns="y")
+    y = df["y"]
+
+    # int() rounds down: 41,176 rows -> 24,705 train, 8,235 val, rest (8,236) test.
+    n = len(df)
+    n_train = int(n * 0.6)
+    n_val = int(n * 0.2)
+    end_val = n_train + n_val
+
+    X_train, y_train = X.iloc[:n_train], y.iloc[:n_train]
+    X_val, y_val = X.iloc[n_train:end_val], y.iloc[n_train:end_val]
+    X_test, y_test = X.iloc[end_val:], y.iloc[end_val:]
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
 def build_preprocessor():
     """Return an UNFITTED ColumnTransformer. Fit it on X_train only."""
     return ColumnTransformer(

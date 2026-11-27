@@ -25,18 +25,22 @@ E. Five oral-defence questions about this module.
 
 If you are unsure of any syntax or library behaviour, say so instead of guessing.
 
-**Follow-up prompt:**
-Follow-up on src/data_prep.py (Module 2, UCI Bank Marketing). I reviewed your draft and ran it. Findings:
-1. Dedup runs before duration is dropped, so 2,009 rows are identical on all remaining features (481 test rows match a train row). DECISION: keep them, only exact duplicates are removed. Add a comment in clean() stating this and the cost (slightly optimistic test scores).
-2. The notebook Cleaning_Preprocessing.ipynb uses pdays_clean and drops pdays, but data_prep.py keeps pdays. DECISION: the column is named pdays everywhere.
+**Date:** 2026-11-25
+**AI tool:** Claude Code (draft), Claude chat (review)
+**Status:** Executed, reviewed, corrected.
 
-Do exactly this and nothing else:
-- Update Cleaning_Preprocessing.ipynb so it calls data_prep.load_raw, clean, split and build_preprocessor instead of repeating the cleaning code, and regenerate bank_clean.csv with a pdays column (no pdays_clean).
-- Do not touch the baseline cells, and do not change the split sizes, random_state=42, or the preprocessor definition.
-- Add an assertions cell: sizes 24,705 / 8,235 / 8,236, class share per split, no index overlap between splits, "pdays" in columns and "pdays_clean" not, preprocessor unfitted before fit, scaler mean computed from train only.
-- Add a comment that a random split hides the date drift in this date-sorted file.
+### Prompt iteration and human review
+- Initial prompt: asked for a constrained draft of src/data_prep.py (4 functions, leakage rules, assumptions, checks, oral questions).
+- What the AI got right: [e.g. duration dropped, nothing fitted before the split, unfitted preprocessor, stratified split].
+- What I found when I ran it: [dedup before dropping duration -> 2,009 near-duplicates; pdays vs pdays_clean mismatch between the module and the notebook].
+- My decisions: kept the near-duplicates (no customer id, can't tell if they are the same customer); name the column pdays everywhere.
+- Follow-up prompt: gave those decisions and asked for the notebook to call the shared module, plus an assertions cell. I read the diff and ran the assertions myself.
+- Not verified: effect of the near-duplicates on scores.
 
-Show me a diff of every change, tell me anything you are unsure of instead of guessing, and list any other issue you notice without fixing it.
+### Conclusion
+[1-2 sentences: what the guardrails improved, what still needed human checking.]
+
+**Related audit:** AI_AUDIT.md - Audit 3 and Audit 4.
 
 ---
 
