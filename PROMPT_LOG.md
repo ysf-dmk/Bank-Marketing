@@ -25,6 +25,26 @@ E. Five oral-defence questions about this module.
 
 If you are unsure of any syntax or library behaviour, say so instead of guessing.
 
+**Prompt 0 (sent first, before the prompt above; verbatim):**
+I'm doing Module 2 (cleaning, feature engineering, split, unfitted preprocessor) of a ML group project on UCI Bank Marketing (bank-additional-full.csv, sep=";", 41,188 rows, target y, 11.27% yes). I will write the code myself. Don't write the solution. Give me ordered steps, each with what to do, why in one sentence, and the minimal pandas/sklearn syntax.
+
+Scope: drop duplicates, handle pdays==999, drop duration (leakage), keep "unknown" as a category, stratified 60/20/20 split (random_state=42), and an unfitted ColumnTransformer (scaler + one-hot) that I fit on train only. Not my scope: EDA, baseline model, metrics.
+
+After the steps, give me assertions to run (row counts, no duplicates, no split overlap, class share per split) and 5 oral-defence questions. Say which syntax you're unsure of. Then wait for my code and review it without rewriting it.
+
+**Follow-up prompt (sent after I ran the draft; verbatim):**
+Follow-up on src/data_prep.py (Module 2, UCI Bank Marketing). I reviewed your draft and ran it. Findings:
+1. Dedup runs before duration is dropped, so 2,009 rows are identical on all remaining features (481 test rows match a train row). DECISION: keep them, only exact duplicates are removed. Add a comment in clean() stating this and the cost (slightly optimistic test scores).
+2. The notebook Cleaning_Preprocessing.ipynb uses pdays_clean and drops pdays, but data_prep.py keeps pdays. DECISION: the column is named pdays everywhere.
+
+Do exactly this and nothing else:
+- Update Cleaning_Preprocessing.ipynb so it calls data_prep.load_raw, clean, split and build_preprocessor instead of repeating the cleaning code, and regenerate bank_clean.csv with a pdays column (no pdays_clean).
+- Do not touch the baseline cells, and do not change the split sizes, random_state=42, or the preprocessor definition.
+- Add an assertions cell: sizes 24,705 / 8,235 / 8,236, class share per split, no index overlap between splits, "pdays" in columns and "pdays_clean" not, preprocessor unfitted before fit, scaler mean computed from train only.
+- Add a comment that a random split hides the date drift in this date-sorted file.
+
+Show me a diff of every change, tell me anything you are unsure of instead of guessing, and list any other issue you notice without fixing it.
+
 **Date:** 2026-11-25
 **AI tool:** Claude Code (draft), Claude chat (review)
 **Status:** Executed, reviewed, corrected.
@@ -282,3 +302,69 @@ Update `Alternative_Models_Comparison.ipynb` to align with the final team synchr
 Human review of SHAP estimator compatibility and strict enforcement of validation-only model selection ensured that combining all four tuned families via `Stacking` yielded the strongest generalization on `X_test` while remaining 100% aligned with the shared `src/data_prep.py` protocol.
 
 **Related audit:** `AI_AUDIT.md` — Audit 6 (Module 4 Ensemble & Shared `time_split()` Update).
+
+---
+
+## Entry 6 - Author: Youssef Damak (Module 2 update: chronological split check, Week 3)
+
+**Date:** 2026-11-27
+
+**AI tool:** Claude Code
+
+**Status:** Executed by the assistant on the real data; author review pending.
+
+### Prompt 1 (verbatim): add time_split() and first checks
+
+Role: engineering assistant for Module 2 of our ML group project (UCI Bank Marketing). I am accountable for every line, so write short, commented, reviewable code. Do not fabricate results.
+
+Context: src/data_prep.py already has load_raw(), clean(), split() (stratified random 60/20/20, random_state=42, returns X_train, X_val, X_test, y_train, y_val, y_test) and build_preprocessor() (unfitted). bank-additional-full.csv is sorted by date but has no date column, so row order is our only time proxy. clean() keeps the original index (no reset_index) and drops 12 exact duplicates, leaving 41,176 rows.
+
+Task (week 3): our spec promised to check whether splitting by time order fits how the bank would use the model.
+1. Add time_split(df) to data_prep.py, same return signature as split(): first 60% of rows in original order = train, next 20% = validation, last 20% = test. No shuffling, no stratification. Sizes must be 24,705 / 8,235 / 8,236.
+2. Write an assertions cell: index is increasing and every train index < every val index < every test index; no overlap; sizes as above; positive share of y in each block (print, do not assert equality).
+3. Write a diagnostics cell on TRAIN vs VALIDATION only: for emp.var.rate, euribor3m, nr.employed, cons.price.idx, cons.conf.idx print the train min/max and the share of validation rows outside the train range.
+
+Hard constraints: do not change split(), build_preprocessor() or random_state; nothing fitted before the split; the test set is never scored or inspected for model choices; no model training in this task.
+
+Then answer separately:
+A. One sentence on each design choice.
+B. Every assumption you made (for example that row order equals time order) and how I can verify it in the data.
+C. Three ways this could silently mislead us, including what changes about class balance and about the preprocessor's scaler fitted on early rows.
+D. Which results a model must report on both splits so the comparison is fair.
+E. Five oral-defence questions about this module.
+
+If you are unsure of any syntax or library behaviour, say so instead of guessing. List any other issue you notice without fixing it. Then wait for my review.
+
+### Prompt 2 (verbatim): stricter assertions, fuller drift diagnostics, inline-split check
+
+Role: engineering assistant for Module 2 of our ML group project (UCI Bank Marketing). I am accountable for every line, so write short, commented, reviewable code. Do not fabricate results, and say so if you are unsure of any syntax or library behaviour.
+
+Context:
+- src/data_prep.py already has load_raw(), clean(), split() (stratified random 60/20/20, random_state=42), time_split() (chronological 60/20/20 on row order, same return signature as split(), raises if the index is not increasing) and build_preprocessor() (unfitted).
+- clean() keeps the original index and returns 41,176 rows. The file is date-sorted with no date column, so row order is our time proxy.
+- My notebook Cleaning_Preprocessing.ipynb has a cell that calls time_split(df_clean) and prints the sizes (variables Xt_train, Xt_val, Xt_test, yt_train, yt_val, yt_test). Teammates already report positive rates of about 4.81% in train, 11.07% in validation and 30.83% in test for the chronological split, and a large drop in scores on it.
+
+Task: add two cells after that one. Do not change split(), time_split(), build_preprocessor() or random_state.
+1. Assertions cell: sizes are exactly 24,705 / 8,235 / 8,236; the index is increasing; every train index is smaller than every validation index, and every validation index is smaller than every test index; no index appears in two parts; the three parts together equal df_clean's index; X and y have matching lengths; print (do not assert) the positive share of each block.
+2. Drift diagnostics cell, TRAIN versus VALIDATION only (never test): for emp.var.rate, euribor3m, nr.employed, cons.price.idx and cons.conf.idx, print the train min and max, the validation min and max, and the share of validation rows outside the train [min, max]. Also print how many validation rows fall outside the train range on at least one of the five columns.
+3. A short check that a split built inline as df.iloc[:int(0.6*n)], df.iloc[int(0.6*n):int(0.8*n)], df.iloc[int(0.8*n):] gives exactly the same indices as time_split(), so teammates can confirm their own chronological split matches the shared one.
+
+Hard constraints: nothing is fitted; no model is trained; the test set is never scored and is not used for any statistics; no EDA beyond these cells.
+
+Then answer separately: A. one sentence on each design choice; B. every assumption and how to verify it; C. three ways this could silently mislead us (include what a class share of 4.8% in train and 30.8% in test means for a threshold chosen on validation, and why macro columns act as time proxies); D. what to report next to the random-split results so the comparison is fair; E. five oral-defence questions. List any other issue you notice without fixing it. Then wait for my review.
+
+### What the AI produced and what it measured (from the executed run)
+- Prompt 1: added `time_split()` to `src/data_prep.py` (int-rounded 60/20/20 by row position, raises if the index is not increasing) and three notebook cells (call, assertions, drift diagnostics). Sizes 24,705 / 8,235 / 8,236.
+- Prompt 2: replaced the assertions and diagnostics cells in place (same cell ids) with the stricter versions; the inline-split comparison sits at the end of the assertions cell. A deliberately off-by-one inline split was correctly flagged as different.
+- Measured on the data: positive share 4.81% train, 11.07% validation, 30.83% test. Validation rows outside the train range: 99.76% for euribor3m, 63.97% for each of the other four columns; 8,215 of 8,235 validation rows are outside on at least one column. For four of the five columns the validation maximum equals the train minimum (validation lies entirely below train).
+
+### Human review
+- What the AI got right: [your review]
+- What I found when I ran it: [your review]
+- My decisions: [your review]
+- Not verified: that row order equals time order (no date column; the month-run and euribor3m trend checks were suggested but not run); that `int(0.8*n)` equals `int(0.6*n)+int(0.2*n)` for any n other than 41,176.
+
+### Conclusion
+[1-2 sentences: what the guardrails improved, what still needed human checking.]
+
+**Related audit:** AI_AUDIT.md - [add the audit number if one is written for this update].
