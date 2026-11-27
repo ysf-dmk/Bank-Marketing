@@ -242,8 +242,104 @@ against the shared preprocessing assertions and baseline benchmarks.
 
 ---
 
-## Other individual contributions
+## Module 1 - Exploratory Data Analysis, Data Quality and Model Error Analysis
 
-Chaima must complete her Module 1 section with her implemented
-tasks, deliverables, experimental evidence and AI governance
-contributions.
+**Author:** Chaima Garoui
+
+**Deliverables:** `EDA_and_Data_Quality.ipynb`, `Model_Comparison_and_Error_Analysis.ipynb`
+
+### Completed tasks — Exploratory Data Analysis and Data Quality
+
+- Exploration of the original Bank Marketing dataset containing 41,188 observations and 21 variables.
+- Identification of numerical and categorical features.
+- Analysis of missing values and implicit missing information represented by the "unknown" category.
+- Identification of 12 exact duplicate rows.
+- Analysis of target class imbalance.
+- Exploration of customer demographic, financial and campaign-related characteristics.
+- Analysis of subscription rates across age, occupation, education and other customer characteristics.
+- Identification of potential data leakage associated with the duration variable.
+- Identification of the special meaning of the pdays value 999.
+- Development of statistical visualizations and interpretation of observed patterns.
+- Application of 95% Wilson confidence intervals to assess the reliability of subscription rates across education levels.
+
+### Additional experiments — Week 3 Model Comparison and Error Analysis
+
+- Comparison of Dummy Classifier, default Logistic Regression and threshold-optimized Logistic Regression on the validation set.
+- Analysis of false positives and false negatives.
+- Business cost sensitivity and break-even analysis under different hypothetical misclassification costs.
+- Evaluation of model performance across age, occupation, education and marital status groups.
+- Calculation and visualization of 95% Wilson confidence intervals for subgroup recall.
+- Identification of subgroup performance disparities and statistical limitations.
+- Development of cumulative gains and lift curves.
+- Top-K customer targeting analysis under different marketing budget scenarios.
+- Interpretation of experimental results and business implications.
+- Full notebook execution and publication on GitHub.
+
+### Human decisions
+
+- Treat "unknown" values as implicit missing information rather than standard missing values.
+- Recommend excluding duration from predictive modeling to prevent data leakage.
+- Avoid relying exclusively on accuracy because of the imbalanced target distribution.
+- Use Wilson confidence intervals rather than interpreting subgroup percentages without considering sample sizes.
+- Use recall and false positive rates to investigate differences in model performance across customer groups.
+- Preserve the independent test set during exploratory model comparison.
+- Treat business misclassification costs as hypothetical scenarios rather than actual financial estimates.
+- Avoid interpreting observed demographic disparities as proof of discrimination or causal relationships.
+
+### AI governance contributions
+
+- AI-assisted development of exploratory analysis, visualization and statistical evaluation code.
+- Review and execution of AI-generated code in Google Colab.
+- Statistical verification of potentially misleading subscription rates in small demographic groups.
+- Verification of subgroup recall estimates using Wilson confidence intervals.
+- Documentation of methodological assumptions, experimental limitations and human decisions.
+
+### Main experimental results — Exploratory Data Analysis
+
+- Original dataset: 41,188 observations and 21 variables.
+- Target distribution: 88.73% non-subscribers and 11.27% subscribers.
+- No conventional missing values, but several categorical variables contain "unknown" values.
+- 12 exact duplicate observations identified.
+- Customers aged 65 and above showed a subscription rate of approximately 47.21%.
+- The illiterate education category showed a subscription rate of 22.22%, based on only 18 observations.
+- The corresponding 95% Wilson confidence interval was approximately [9.00%, 45.21%], demonstrating substantial statistical uncertainty.
+
+### Main experimental results — Model Error Analysis
+
+- Validation dataset: 8,235 customers, including 928 actual subscribers.
+- Default Logistic Regression: 91 false positives and 723 false negatives.
+- Threshold-optimized Logistic Regression: 480 false positives and 439 false negatives.
+- Recall improved from 22.09% to 52.69% after threshold optimization.
+- Business cost break-even between Dummy Classifier and default Logistic Regression: approximately €0.4439 per false negative.
+- Business cost break-even between default and optimized Logistic Regression: approximately €1.3697 per false negative, assuming a fixed false positive cost of €1.
+
+### Subgroup performance results
+
+- Customers aged 65 and above: recall of 90.16%, but a false positive rate of 75.38%.
+- Customers aged 35–44: recall of 42.98%.
+- Students: recall of 84.21%.
+- Blue-collar workers: recall of 25.83%.
+- Entrepreneurs: recall of 16.00%.
+- University degree holders: recall of 59.53%, compared with 32.63% for customers with basic.9y education.
+- Single customers: recall of 60.00%, compared with 47.98% for married customers.
+
+Confidence intervals were used to assess the uncertainty of these estimates. Groups with few or no actual subscribers were interpreted cautiously.
+
+### Business targeting results
+
+- Targeting the top 5% of customers captured 28.23% of observed subscribers, with a lift of 5.64.
+- Targeting the top 10% captured 46.88% of observed subscribers, with a lift of 4.68.
+- Targeting the top 20% captured 65.19% of observed subscribers, with a lift of 3.26.
+- The top 20% targeting strategy would reduce the number of contacts from 8,235 to 1,647 in the validation simulation.
+
+These results demonstrate the potential value of probability-based customer ranking for marketing resource allocation. They do not establish actual campaign profitability or causal impact.
+
+### Individual accountability
+
+Responsible for the implementation, verification, interpretation and documentation of exploratory data analysis, data quality assessment, statistical reliability analysis, model error analysis and business-oriented evaluation.
+
+AI-assisted code was reviewed, executed and interpreted by the contributor. Experimental results were checked against the dataset and shared baseline results.
+
+The independent test set was not used in the individual model error analysis or customer targeting experiments.
+
+**Status:** Individual EDA and baseline error analysis completed. Extension of the analysis to the team's alternative and ensemble models remains pending.

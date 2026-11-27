@@ -549,3 +549,64 @@ Generic interpretability blocks assume the winning model is always a single tree
 Enforcing pipeline encapsulation inside cross-validation, post-hoc probability calibration, SHAP explainer routing, and shared chronological splitting (`src.data_prep.time_split()`) eliminated leakage and runtime failures while establishing `Stacking (4 Tuned Models)` as the top-performing model across both `X_val` and `X_test`.
 
 **Evidence:** `Alternative_Models_Comparison.ipynb`, `src/data_prep.py`
+---
+
+## Author: Chaima Garoui
+
+**Module:** Module 1 — Week 3: Model Comparison and Error Analysis  
+**Date:** 2026-11-27  
+**AI tool:** ChatGPT  
+**Related interaction:** PROMPT_LOG.md — Week 3 Model Evaluation and Error Analysis
+
+## Audit 8 - Statistical Reliability of Subgroup Model Performance
+
+### 1. Catch: Identified limitation
+
+The initial AI-assisted error analysis compared model recall across age groups, occupations, education levels and marital status.
+
+However, recall percentages alone do not account for differences in subgroup sample sizes.
+
+For example, customers with an unknown occupation achieved 100% recall, but this result was based on only five actual subscribers.
+
+### 2. Root cause
+
+The initial evaluation focused on point estimates of recall and false positive rates without measuring statistical uncertainty.
+
+Small subgroups can produce extreme performance values that may not generalize to new customers.
+
+### 3. Statistical consequences
+
+- Small subgroups may appear to have exceptionally high or low model performance.
+- Recall estimates may be unstable when the number of actual subscribers is limited.
+- Differences between demographic groups may be overinterpreted.
+- Marketing decisions based only on subgroup recall may lead to unreliable conclusions.
+- Undefined recall values may be incorrectly interpreted as zero performance.
+
+### 4. Correct: Human intervention
+
+The subgroup evaluation was extended by calculating 95% Wilson confidence intervals for recall.
+
+The number of actual subscribers was retained alongside each recall estimate to support its interpretation.
+
+Confidence interval visualizations were generated for age, occupation, education and marital status.
+
+Groups containing no actual subscribers were assigned NaN for recall and excluded from recall confidence interval visualizations.
+
+The overall model recall was included as a descriptive reference.
+
+### 5. Experimental verification
+
+Recall was calculated as:
+
+Recall = TP / (TP + FN)
+
+The Wilson confidence interval was calculated using the number of true positives as the number of successes and the number of actual subscribers as the sample size.
+
+Actual validation results:
+
+| Subgroup | Actual subscribers | Recall | 95% Wilson CI | CI width |
+|---|---:|---:|---:|---:|
+| Unknown occupation | 5 | 100.00% | 56.55%–100.00% | 43.45 pp |
+| Student | 57 | 84.21% | 72.64%–91.46% | 18.83 pp |
+| Admin. | 299 | 60.54% | 54.89%–65.91% | 11.01 pp |
+| Blue-collar | 120 | 25.83% | 18.84%–34.33% | 15.
