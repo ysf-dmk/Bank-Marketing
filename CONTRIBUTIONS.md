@@ -173,11 +173,17 @@ selection during Module 3 experiments.
   Perceptron (`MLPClassifier` wrapped with `CalibratedClassifierCV`),
   grounded in tabular deep learning and probability calibration
   literature (Gorishniy et al., 2021; Niculescu-Mizil & Caruana, 2005).
+- Construction and validation-only selection of heterogeneous
+  ensemble methods (`VotingClassifier` with soft voting and
+  `StackingClassifier` with a Logistic Regression meta-learner)
+  combining all four tuned candidate models.
 - Comparative ROC and Precision-Recall curve analysis on `X_val`.
-- Global feature attribution via SHAP (`TreeExplainer`) and
-  validation error profiling across TP, FP, FN, and TN outcomes.
-- Chronological (temporal) 60/20/20 split robustness experiment
-  quantifying macroeconomic concept drift (May 2008 – November 2010).
+- Global feature attribution via SHAP (`TreeExplainer` on
+  `LightGBM Tuned`) and validation error profiling across
+  TP, FP, FN, and TN outcomes on the winning `Stacking` model.
+- Chronological 60/20/20 split robustness experiment via the
+  shared `src.data_prep.time_split()` helper, quantifying
+  macroeconomic concept drift (May 2008 – November 2010).
 - Single, final holdout evaluation on the untouched `X_test` set.
 
 ### Human decisions
@@ -188,36 +194,48 @@ selection during Module 3 experiments.
 - Selected `average_precision` (PR-AUC) as the primary optimization
   criterion rather than accuracy due to the 88.73% / 11.27% class
   imbalance.
-- Locked the champion decision threshold (`0.5514`) on `X_val` before
-  running the single evaluation on `X_test`.
+- Routed SHAP attribution to `LightGBM (Tuned)` when the heterogeneous
+  `Stacking` ensemble won on `X_val`, avoiding `TreeExplainer`
+  incompatibility and runtime bottlenecks while keeping error
+  profiling on the `Stacking` champion.
+- Locked the champion decision threshold (`0.2469`) strictly on
+  `X_val` before running the single evaluation on `X_test`.
 
 ### AI governance contributions
 
-- PROMPT_LOG.md: Entries documenting Module 4 experimental design,
-  stratified CV tuning, out-of-course calibrated MLP justification,
-  SHAP error analysis, and chronological drift evaluation.
+- PROMPT_LOG.md: Entry 4 and Entry 5 documenting Module 4
+  experimental design, stratified CV tuning, out-of-course
+  calibrated MLP justification, Voting/Stacking ensemble
+  integration, SHAP error analysis, and `time_split()` alignment.
 - AI_AUDIT.md: Audit 6 (preventing preprocessing leakage inside CV
-  and correcting uncalibrated neural probability outputs).
+  and correcting uncalibrated neural probability outputs) and
+  Audit 7 (SHAP explainer compatibility with Stacking ensembles
+  and shared `time_split()` synchronization).
 
 ### Main experimental results
 
-- Champion Model (`Random Forest Tuned`) Validation PR-AUC: **0.5027**
-  (vs. **0.4742** Logistic Regression baseline), ROC-AUC: **0.8210**,
-  F1-Score: **0.5315** (threshold **0.5514**, Recall **0.6002**).
-- Out-of-Course Model (`Calibrated MLP`) Validation PR-AUC: **0.4798**,
-  ROC-AUC: **0.8072**, F1-Score: **0.5194**.
-- Holdout Test Set (`X_test`) Champion Results: PR-AUC **0.4632**
-  (vs. **0.4423** baseline), ROC-AUC **0.7953**, F1-Score **0.5049**
-  (Recall improved from **0.5032** to **0.5830**).
-- Chronological Split Drift Check: Positive class rate shifted from
-  **4.81%** (2008–2009 train) to **30.83%** (2010 test), reducing
-  chronological validation PR-AUC to **0.1197** (ROC-AUC **0.5441**).
+- Champion Model (`Stacking — 4 Tuned Models`) Validation PR-AUC:
+  **0.5038** (vs. **0.5027** Tuned Random Forest, **0.5006** Soft
+  Voting, and **0.4742** Logistic Regression baseline), ROC-AUC:
+  **0.8231**, F1-Score: **0.5362** (threshold **0.2469**, Recall
+  **0.5787**, Precision **0.4995**).
+- Individual Tuned Models on `X_val`: Random Forest PR-AUC **0.5027**,
+  XGBoost **0.4920**, LightGBM **0.4919**, Out-of-Course Calibrated
+  MLP **0.4798** (F1 **0.5194**).
+- Holdout Test Set (`X_test`) Champion Results (`Stacking`): PR-AUC
+  **0.4625** (vs. **0.4423** baseline), ROC-AUC **0.7975** (vs.
+  **0.7908**), F1-Score **0.5086** (vs. **0.4812**), improving
+  subscriber recall from **0.5032** to **0.5593** (519/928 captured).
+- Shared `time_split()` Drift Check: Positive class rate shifted from
+  **4.81%** (2008–2009 train) to **11.07%** (val) and **30.83%**
+  (2010 test), reducing chronological validation PR-AUC to **0.0930**
+  (ROC-AUC **0.4395**).
 
 ### Individual accountability
 
 Responsible for the implementation, cross-validation tuning,
-interpretability, temporal drift analysis, final holdout testing,
-and documentation of Module 4.
+ensemble modeling, interpretability, temporal drift analysis,
+final holdout testing, and documentation of Module 4.
 
 AI-assisted code drafts were reviewed, executed, and verified
 against the shared preprocessing assertions and baseline benchmarks.

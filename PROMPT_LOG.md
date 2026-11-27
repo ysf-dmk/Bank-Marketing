@@ -44,6 +44,81 @@ If you are unsure of any syntax or library behaviour, say so instead of guessing
 
 ---
 
+## Entry 2 - Author: Chaima Garoui (Module 1: EDA and data quality)
+
+**Date:** Week 1–2
+
+**Note:** The following prompts are reconstructed from the AI-assisted work carried out during this module.
+
+**Prompt 1:** Role: act as a Machine Learning tutor and guide me through the exploratory data analysis of our group project. Explain each step before moving to the next one.
+
+Data: UCI Bank Marketing, bank-additional-full.csv, separator=";", 41,188 observations, 20 input features and a binary target variable y.
+
+Objective: predict whether a customer will subscribe to a term deposit before the marketing call.
+
+Help me perform the following tasks in Google Colab:
+
+1. Load the dataset and verify its dimensions.
+2. Identify numerical and categorical variables.
+3. Check for missing values, including categorical values labelled "unknown".
+4. Detect duplicate rows and calculate their percentage.
+5. Analyze the target distribution and explain the impact of class imbalance.
+6. Generate descriptive statistics and relevant visualizations.
+
+Provide Python code one step at a time. Wait for my output before continuing. Do not clean the dataset or train any model yet, as these tasks belong to other team members.
+
+Explain the results in simple English and do not invent numerical findings.
+
+**Prompt 2:** I have completed the initial EDA. Help me interpret the following observations and identify the main issues that need to be communicated to the preprocessing team.
+
+Findings:
+
+- 41,188 observations and 21 columns, including the target.
+- No standard NaN values.
+- Several categorical features contain "unknown" values.
+- 12 exact duplicate rows.
+- 88.73% of customers did not subscribe, while 11.27% subscribed.
+- Subscription rates vary across age groups, occupations and education levels.
+- The duration variable is only available after the call.
+- A value of 999 in pdays indicates no previous contact.
+
+Explain:
+
+A. Why accuracy alone is not sufficient for this classification problem.
+
+B. Why duration introduces data leakage.
+
+C. Whether the duplicate rows should be removed, considering that the dataset has no unique customer identifier.
+
+D. How unknown categorical values and the special value in pdays could be handled during preprocessing.
+
+E. Why high subscription rates in small customer groups should be interpreted carefully.
+
+Distinguish observed results from assumptions. Do not interpret statistical associations as causal relationships.
+
+**Prompt 3:** I have completed my EDA notebook in Google Colab and need to share my work with the other three members of our Machine Learning project.
+
+Repository: ysf-dmk/Bank-Marketing.
+
+The notebook currently loads the dataset from /content/bank-additional-full.csv, which requires manually uploading the file in every new Colab session.
+
+Help me:
+
+1. Upload the original dataset to the shared GitHub repository.
+2. Replace the temporary dataset path with a GitHub raw URL.
+3. Resolve any dataset loading errors.
+4. Verify that the notebook runs successfully from beginning to end.
+5. Upload the updated notebook under a filename that reflects my EDA contribution.
+6. Create a README.md containing the project objective, dataset description, EDA findings and preprocessing recommendations.
+
+Do not modify the original dataset or implement the preprocessing pipeline.
+
+The documentation should clearly distinguish completed work from planned experiments. Do not report model performance before the baseline has been implemented.
+
+Guide me step by step and explain the purpose of each action.
+
+---
+
 ## Entry 3 - Author: Mariem Dridi (Module 3: Baseline and Evaluation)
 
 **Date:** 2026-11-26
@@ -127,85 +202,6 @@ necessary.
 Evaluation, for detailed error analysis, corrected code
 and experimental evidence.
 
-
-
-
----
-
-## Entry 2 - Author: Chaima Garoui (Module 1: EDA and data quality)
-
-**Date:** Week 1–2
-
-**Note:** The following prompts are reconstructed from the AI-assisted work carried out during this module.
-
-**Prompt 1:** Role: act as a Machine Learning tutor and guide me through the exploratory data analysis of our group project. Explain each step before moving to the next one.
-
-Data: UCI Bank Marketing, bank-additional-full.csv, separator=";", 41,188 observations, 20 input features and a binary target variable y.
-
-Objective: predict whether a customer will subscribe to a term deposit before the marketing call.
-
-Help me perform the following tasks in Google Colab:
-
-1. Load the dataset and verify its dimensions.
-2. Identify numerical and categorical variables.
-3. Check for missing values, including categorical values labelled "unknown".
-4. Detect duplicate rows and calculate their percentage.
-5. Analyze the target distribution and explain the impact of class imbalance.
-6. Generate descriptive statistics and relevant visualizations.
-
-Provide Python code one step at a time. Wait for my output before continuing. Do not clean the dataset or train any model yet, as these tasks belong to other team members.
-
-Explain the results in simple English and do not invent numerical findings.
-
-**Prompt 2:** I have completed the initial EDA. Help me interpret the following observations and identify the main issues that need to be communicated to the preprocessing team.
-
-Findings:
-
-- 41,188 observations and 21 columns, including the target.
-- No standard NaN values.
-- Several categorical features contain "unknown" values.
-- 12 exact duplicate rows.
-- 88.73% of customers did not subscribe, while 11.27% subscribed.
-- Subscription rates vary across age groups, occupations and education levels.
-- The duration variable is only available after the call.
-- A value of 999 in pdays indicates no previous contact.
-
-Explain:
-
-A. Why accuracy alone is not sufficient for this classification problem.
-
-B. Why duration introduces data leakage.
-
-C. Whether the duplicate rows should be removed, considering that the dataset has no unique customer identifier.
-
-D. How unknown categorical values and the special value in pdays could be handled during preprocessing.
-
-E. Why high subscription rates in small customer groups should be interpreted carefully.
-
-Distinguish observed results from assumptions. Do not interpret statistical associations as causal relationships.
-
-**Prompt 3:** I have completed my EDA notebook in Google Colab and need to share my work with the other three members of our Machine Learning project.
-
-Repository: ysf-dmk/Bank-Marketing.
-
-The notebook currently loads the dataset from /content/bank-additional-full.csv, which requires manually uploading the file in every new Colab session.
-
-Help me:
-
-1. Upload the original dataset to the shared GitHub repository.
-2. Replace the temporary dataset path with a GitHub raw URL.
-3. Resolve any dataset loading errors.
-4. Verify that the notebook runs successfully from beginning to end.
-5. Upload the updated notebook under a filename that reflects my EDA contribution.
-6. Create a README.md containing the project objective, dataset description, EDA findings and preprocessing recommendations.
-
-Do not modify the original dataset or implement the preprocessing pipeline.
-
-The documentation should clearly distinguish completed work from planned experiments. Do not report model performance before the baseline has been implemented.
-
-Guide me step by step and explain the purpose of each action.
-
-
 ---
 
 ## Entry 4 - Author: Adam Nasri (Module 4: Alternative Models and Performance Comparison)
@@ -248,11 +244,41 @@ The refined prompt enforced strict engineering and statistical guardrails:
 - Schema and split assertions verifying exact alignment with Module 2 and Module 3 (`24,705 / 8,235 / 8,236` rows, zero leakage of `duration`).
 - Pipeline encapsulation inside `RandomizedSearchCV` to prevent scaling leakage across CV folds.
 - Post-hoc probability calibration (`CalibratedClassifierCV`) for the out-of-course MLP model so predicted probabilities remain reliable under class imbalance.
-- Chronological split evaluation exposing severe macroeconomic concept drift (positive rate shifting from `4.81%` in 2008–2009 to `30.83%` in 2010, dropping chronological validation PR-AUC to `0.1197`).
-- Single-pass evaluation on `X_test` confirming that `Random Forest (Tuned)` outperforms the baseline (`Test PR-AUC = 0.4632` vs. `0.4423`; `Test F1 = 0.5049` vs. `0.4812`).
+- Chronological split evaluation exposing severe macroeconomic concept drift (positive rate shifting from `4.81%` in 2008–2009 to `30.83%` in 2010).
+- Single-pass evaluation on `X_test` confirming that `Random Forest (Tuned)` outperformed the linear baseline (`Val PR-AUC = 0.5027`, `Test PR-AUC = 0.4632`).
 
 ### Conclusion
 
 Constraining the AI to reuse the shared preprocessing module, nest transformers inside CV pipelines, and validate temporal drift prevented cross-validation leakage and produced reproducible, experimentally verified results across validation and holdout test sets.
 
 **Related audit:** `AI_AUDIT.md` — Audit 5 (Module 4: Alternative Models and Performance Comparison).
+
+---
+
+## Entry 5 - Author: Adam Nasri (Module 4 Update: Voting & Stacking Ensembles + Shared `time_split()`)
+
+**Date:** 2026-11-27
+
+**AI tool:** Gemini
+
+**Status:** Executed, verified, and integrated into `Alternative_Models_Comparison.ipynb`.
+
+### Prompt
+
+Update `Alternative_Models_Comparison.ipynb` to align with the final team synchronization protocol:
+1. Combine the four tuned candidate models (`Random Forest`, `XGBoost`, `LightGBM`, and `Calibrated MLP`) using `VotingClassifier(voting="soft")` and `StackingClassifier` (with a `LogisticRegression` meta-learner and 5-fold stratified CV), selecting the champion model strictly on `X_val` before evaluating once on `X_test`.
+2. Update ROC/PR comparison plots, SHAP attribution, and error profiling to reflect the ensemble champion without breaking `shap.TreeExplainer`.
+3. Replace the manual chronological split in Section 4 with the shared `time_split()` function from `src/data_prep.py` to guarantee exact team-wide parity.
+
+### Prompt iteration and human review
+
+- **What the AI proposed:** Added `Soft Voting` and `Stacking` cells on top of the four tuned estimators, updated validation leaderboard sorting, and replaced the manual slicing in Section 4 with `src.data_prep.time_split()`.
+- **What I caught and corrected during execution:**
+  1. **SHAP Compatibility & Runtime Bottleneck:** Because `Stacking (4 Tuned Models)` outperformed all single models on `X_val` (`PR-AUC = 0.5038` vs. `0.5027` for Tuned RF), `shap.TreeExplainer` could not be applied directly to the heterogeneous stacking meta-estimator, and running `TreeExplainer` on a 200-tree `RandomForestClassifier` was computationally slow. I explicitly routed SHAP attribution to `LightGBM (Tuned)` while keeping the validation confusion matrix and error profile (`TP=537, FP=538, FN=391, TN=6769`) on the winning `Stacking` champion.
+  2. **Module Reload & Protocol Verification:** Verified exact split dimensions (`24,705 / 8,235 / 8,236`) and class-prior shift (`4.81% -> 11.07% -> 30.83%`) under `time_split()`, and confirmed single-pass generalization on `X_test` (`Stacking Test PR-AUC = 0.4625`, `ROC-AUC = 0.7975`, `F1 = 0.5086` vs. `Logistic Regression Test PR-AUC = 0.4423`).
+
+### Conclusion
+
+Human review of SHAP estimator compatibility and strict enforcement of validation-only model selection ensured that combining all four tuned families via `Stacking` yielded the strongest generalization on `X_test` while remaining 100% aligned with the shared `src/data_prep.py` protocol.
+
+**Related audit:** `AI_AUDIT.md` — Audit 6 (Module 4 Ensemble & Shared `time_split()` Update).

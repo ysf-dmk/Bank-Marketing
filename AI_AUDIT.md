@@ -174,7 +174,6 @@ or threshold selection during this audit.
 
 **Evidence:** Baseline_Model.ipynb
 
-
 ---
 
 ## Author: Youssef Damak
@@ -337,8 +336,6 @@ and the duplicate question required a human decision.
 **Evidence:** src/data_prep.py, Cleaning_Preprocessing.ipynb
 (assertions cell)
 
-
-
 ---
 
 ## Author: Chaima Garoui
@@ -403,36 +400,34 @@ subscription rates from the precision of their estimates.
 
 Verification code:
 
-```python
-from statsmodels.stats.proportion import proportion_confint
+    from statsmodels.stats.proportion import proportion_confint
 
-education_audit = (
-    df.groupby("education")["y"]
-    .agg(
-        total_customers="count",
-        subscribers=lambda x: (x == "yes").sum()
+    education_audit = (
+        df.groupby("education")["y"]
+        .agg(
+            total_customers="count",
+            subscribers=lambda x: (x == "yes").sum()
+        )
+        .reset_index()
     )
-    .reset_index()
-)
 
-education_audit["subscription_rate"] = (
-    education_audit["subscribers"]
-    / education_audit["total_customers"]
-)
+    education_audit["subscription_rate"] = (
+        education_audit["subscribers"]
+        / education_audit["total_customers"]
+    )
 
-lower, upper = proportion_confint(
-    count=education_audit["subscribers"],
-    nobs=education_audit["total_customers"],
-    alpha=0.05,
-    method="wilson"
-)
+    lower, upper = proportion_confint(
+        count=education_audit["subscribers"],
+        nobs=education_audit["total_customers"],
+        alpha=0.05,
+        method="wilson"
+    )
 
-education_audit["CI_lower"] = lower
-education_audit["CI_upper"] = upper
-education_audit["CI_width"] = upper - lower
+    education_audit["CI_lower"] = lower
+    education_audit["CI_upper"] = upper
+    education_audit["CI_width"] = upper - lower
 
-display(education_audit.round(4))
-```
+    display(education_audit.round(4))
 
 Actual results:
 
@@ -488,7 +483,7 @@ strong results.
 **Module:** Module 4 - Alternative Models and Performance Comparison
 **Date:** 2026-11-27
 **AI tool:** Gemini
-**Related interaction:** PROMPT_LOG.md - Module 4 Entries
+**Related interaction:** PROMPT_LOG.md - Entry 4 & Entry 5
 
 ---
 
@@ -518,3 +513,39 @@ Standard hyperparameter tuning templates often call `preprocessor.fit_transform(
 - Verified that all candidate pipelines (`Random Forest`, `XGBoost`, `LightGBM`, `Calibrated MLP`) accept raw `X_train` / `X_val` / `X_test` DataFrames directly and beat the Module 3 baseline on `X_val` (`0.5027` and `0.4798` vs. `0.4742` PR-AUC) without touching `X_test` until the final cell.
 
 **Status:** Verified and integrated into `Alternative_Models_Comparison.ipynb`.
+
+---
+
+## Audit 7 - SHAP Explainer Compatibility with Stacking Ensembles & Shared `time_split()` Alignment
+
+### 1. Catch: Identified flaws
+
+1. When `Stacking (4 Tuned Models)` outperformed all single models on `X_val` (`PR-AUC = 0.5038`), `shap.TreeExplainer` could not be applied directly to the heterogeneous `StackingClassifier` meta-estimator, and running `TreeExplainer` on a 200-tree `RandomForestClassifier` caused a severe runtime bottleneck.
+2. Section 4 originally implemented a manual chronological slice instead of calling the team's shared `src.data_prep.time_split()` helper.
+
+### 2. Root cause
+
+Generic interpretability blocks assume the winning model is always a single tree estimator, while parallel module updates temporarily decoupled the chronological slicing code from `src/data_prep.py`.
+
+### 3. Technical & statistical consequences
+
+- Calling `shap.TreeExplainer` on a `StackingClassifier` raises a `TypeError` / `InvalidModelError`, breaking notebook execution before error profiling and final holdout evaluation.
+- Duplicating chronological split logic risks subtle boundary discrepancies across team notebooks.
+
+### 4. Correct: Human intervention
+
+- Explicitly routed SHAP feature attribution to `LightGBM (Tuned)` (`TreeExplainer` finishes in <5 seconds) while computing the validation confusion matrix and error profile (`TP=537, FP=538, FN=391, TN=6769`) on the winning `Stacking` champion.
+- Replaced the manual chronological split with `src.data_prep.time_split()` and enforced strict validation-only model selection (`Stacking` selected on `X_val` PR-AUC = `0.5038`, threshold = `0.2469`) prior to the single evaluation on `X_test`.
+
+### 5. Experimental verification
+
+- Verified exact chronological split counts (`24,705 / 8,235 / 8,236`) and class-prior drift (`4.81% -> 11.07% -> 30.83%`, chronological validation PR-AUC = `0.0930`).
+- Verified single-pass holdout generalization on untouched `X_test`: `Stacking (4 Tuned Models)` achieved **PR-AUC = `0.4625`**, **ROC-AUC = `0.7975`**, and **F1 = `0.5086`** (outperforming `Logistic Regression` at `0.4423` PR-AUC, `0.7908` ROC-AUC, and `0.4812` F1).
+
+**Status:** Verified and integrated into `Alternative_Models_Comparison.ipynb`.
+
+### Overall conclusion (Module 4)
+
+Enforcing pipeline encapsulation inside cross-validation, post-hoc probability calibration, SHAP explainer routing, and shared chronological splitting (`src.data_prep.time_split()`) eliminated leakage and runtime failures while establishing `Stacking (4 Tuned Models)` as the top-performing model across both `X_val` and `X_test`.
+
+**Evidence:** `Alternative_Models_Comparison.ipynb`, `src/data_prep.py`
