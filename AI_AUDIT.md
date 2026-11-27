@@ -336,3 +336,148 @@ and the duplicate question required a human decision.
 
 **Evidence:** src/data_prep.py, Cleaning_Preprocessing.ipynb
 (assertions cell)
+
+
+
+---
+
+## Author: Chaima Garoui
+
+**Module:** Module 1 - Exploratory Data Analysis and Data Quality
+
+**Date:** 2026-11-27
+
+**AI tool:** ChatGPT
+
+**Related interaction:** PROMPT_LOG.md - Module 1 EDA interpretation
+
+## Audit 5 - Statistical uncertainty in small customer groups
+
+### 1. Catch: Identified limitation
+
+The initial AI-assisted exploratory analysis compared
+subscription rates across education categories.
+
+The illiterate category appeared to have the highest
+subscription rate, at 22.22%.
+
+However, comparing percentages alone does not account
+for differences in sample size or statistical uncertainty.
+
+### 2. Root cause
+
+The initial descriptive analysis focused on observed
+subscription rates without quantifying their uncertainty.
+
+The illiterate category contains only 18 customers.
+Four of them subscribed to a term deposit.
+
+A percentage calculated from such a small group is
+sensitive to changes in individual observations.
+
+### 3. Statistical consequences
+
+- Small groups can appear artificially prominent in
+  rankings based on observed subscription rates.
+- The estimated subscription rate may be unstable.
+- Differences between education categories may be
+  overinterpreted.
+- Marketing recommendations based only on these
+  percentages could be misleading.
+
+### 4. Correct: Human intervention
+
+The descriptive analysis was extended to include
+the number of customers, number of subscribers and
+95% Wilson confidence intervals for each education
+category.
+
+The Wilson method was selected because it is generally
+more suitable than the standard normal approximation
+for small samples and binomial proportions.
+
+The interpretation was revised to distinguish observed
+subscription rates from the precision of their estimates.
+
+### 5. Experimental verification
+
+Verification code:
+
+```python
+from statsmodels.stats.proportion import proportion_confint
+
+education_audit = (
+    df.groupby("education")["y"]
+    .agg(
+        total_customers="count",
+        subscribers=lambda x: (x == "yes").sum()
+    )
+    .reset_index()
+)
+
+education_audit["subscription_rate"] = (
+    education_audit["subscribers"]
+    / education_audit["total_customers"]
+)
+
+lower, upper = proportion_confint(
+    count=education_audit["subscribers"],
+    nobs=education_audit["total_customers"],
+    alpha=0.05,
+    method="wilson"
+)
+
+education_audit["CI_lower"] = lower
+education_audit["CI_upper"] = upper
+education_audit["CI_width"] = upper - lower
+
+display(education_audit.round(4))
+```
+
+Actual results:
+
+| Education | Customers | Subscribers | Rate | 95% CI | CI width |
+|---|---:|---:|---:|---|---:|
+| illiterate | 18 | 4 | 22.22% | 9.00%-45.21% | 36.21 pp |
+| university.degree | 12168 | 1670 | 13.72% | 13.12%-14.35% | 1.22 pp |
+
+The confidence interval for the illiterate category
+is approximately 30 times wider than that of the
+university degree category.
+
+The verification confirms that the higher observed
+subscription rate is associated with much greater
+statistical uncertainty.
+
+### 6. Remaining limitations
+
+- The confidence intervals assume independent
+  binomial observations.
+- No formal hypothesis test comparing education
+  categories was performed.
+- Potential confounding variables such as age and
+  occupation were not controlled.
+- The analysis does not establish a causal
+  relationship between education and subscription.
+- This analysis is descriptive and uses the original
+  dataset. It must not be used to select models or
+  tune hyperparameters using the held-out test data.
+
+**Status:** Statistical interpretation extended and
+verified using the original dataset.
+
+### Overall conclusion (Module 1)
+
+The audit shows that descriptive percentages alone
+are not sufficient when comparing groups with very
+different sample sizes.
+
+Adding confidence intervals made the interpretation
+more statistically rigorous and reduced the risk of
+drawing unsupported conclusions.
+
+AI-assisted interpretations require human review,
+especially when small groups produce apparently
+strong results.
+
+**Evidence:** EDA_and_Data_Quality.ipynb
