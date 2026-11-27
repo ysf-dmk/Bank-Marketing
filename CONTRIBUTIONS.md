@@ -59,6 +59,22 @@ interpretation and documentation of Module 3.
 AI-generated recommendations were reviewed and
 experimentally verified where applicable.
 
+### Additional experiment — Temporal Sensitivity Analysis
+
+- Reused the chronological time_split() function from
+  src/data_prep.py.
+- Verified temporal split sizes and class distributions.
+- Retrained DummyClassifier and Logistic Regression using
+  the temporal training set.
+- Evaluated both models exclusively on temporal validation.
+- Optimized the classification threshold independently.
+- Generated confusion matrices and comparative visualizations.
+- Compared random and temporal validation performance.
+- Documented temporal generalization limitations.
+
+The test sets were not used for model evaluation or
+threshold selection.
+
 ---
 
 ## Module 2 - Data Cleaning and Preprocessing
